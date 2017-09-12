@@ -4,10 +4,10 @@ events {
     worker_connections  1024;
 }
 
-{{ $ports := split $.Env.SERVICES_LB "," }}
+{{ $bind := $.Env.SERVICE_BIND }}
+{{ $port := $.Env.SERVICE_PORT }}
 {{ $hosts := split $.Env.SERVICES_HOSTS "," }}
 
-{{ range $port := $ports }}
 # Load balance UDP-based DNS traffic across two servers
 stream {
     upstream udp_{{$port}} {
@@ -17,11 +17,10 @@ stream {
     }
 
     server {
-        listen {{$port}} udp;
+        listen {{$bind}} udp;
         proxy_pass udp_{{$port}};
         proxy_timeout 1s;
         proxy_responses 1;
         error_log dns.log;
     }
 }
-{{ end }}
