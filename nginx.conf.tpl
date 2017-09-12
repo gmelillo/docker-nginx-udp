@@ -5,20 +5,14 @@ events {
 }
 
 {{ $ports := split $.Env.SERVICES_LB "," }}
+{{ $hosts := split $.Env.SERVICES_HOSTS "," }}
 
 {{ range $port := $ports }}
-{{ range $service, $containers := groupByMulti $ "Env.SERVICES_CLIENT" "," }}
-{{ if eq $port $service }}
 # Load balance UDP-based DNS traffic across two servers
 stream {
     upstream udp_{{$port}} {
-      {{ range $container := $containers }}
-        {{ range $address := $container.Addresses }}
-                {{ if eq $address.Port $port }}
-                # {{$container.Name}}
-                server {{ $address.IP }}:{{ $address.Port }};
-                {{ end }}
-        {{ end }}
+      {{ range $host := $hosts }} 
+       server {{ $host }}:{{ $port }};
       {{ end }}
     }
 
@@ -30,6 +24,4 @@ stream {
         error_log dns.log;
     }
 }
-{{ end }}
-{{ end }}
 {{ end }}
