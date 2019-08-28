@@ -1,4 +1,4 @@
-FROM nginx:1.17-alpine
+FROM nginx:1.17.3-alpine
 MAINTAINER Damien Garros <dgarros@gmail.com>
 
 RUN apk update
